@@ -1,4 +1,5 @@
 //this is a dynamic matrix class that can make matrices of any size
+//pretty cool, yuh?
 public class Matrix {
     int rows;
     int columns;
@@ -18,13 +19,15 @@ public class Matrix {
             System.arraycopy(data[i], 0, this.array[i], 0, columns);
         }
     }
+
     public double get(int row, int column) {
         return array[row][column];
     }
-    public void display() {
+    //
+    public void display() { //this method ↓↓ prints the matrix to the console
         for (double[] row : array) {
             for (double value : row) {
-                System.out.print(value + "\t");
+                System.out.print(value + "\t"); // \t is a tab character btw 
             }
             System.out.println();
         }
