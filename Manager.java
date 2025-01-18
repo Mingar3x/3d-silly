@@ -10,13 +10,15 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import java.util.Random;
 import java.util.ArrayList;
 
+//this ↓↓ makes the angry yellows go away :) 
+//@SuppressWarnings("unused")
+
 public class Manager extends JPanel implements KeyListener , MouseMotionListener {
     private JFrame myFrame;
-    private double sensitivity=2;
+    private double mouseSensitivity=1.0;
 
     private Random r = new Random();
 
@@ -29,7 +31,7 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     //constructor
     private Manager() {
         myFrame = new JFrame("Game!");
-
+        Matrix projecMatrix;
         myFrame.add(this);
         this.addKeyListener(this);
         this.addMouseMotionListener(this);
@@ -43,6 +45,7 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
         initalizeScreen();
         
     }
+    //this ↓↓ is the drawing method that is called every frame
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setColor(Color.PINK);
@@ -52,7 +55,20 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     public void initalizeScreen(){
         
     }
-    
+    public double[][] calculateProjectionMatrix() {
+        double fov = 90;
+        double aspectRatio = screenWidth / screenHeight;
+        double near = 0.1;
+        double far = 10000;
+        double f = 1 / Math.tan(Math.toRadians(fov) / 2);
+        double[][] projectionMatrix = {
+            {f / aspectRatio, 0, 0, 0},
+            {0, f, 0, 0},
+            {0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)},
+            {0, 0, -1, 0}
+        };
+        return projectionMatrix;
+    }
     
 
     public void keyTyped(KeyEvent e) {
