@@ -19,7 +19,7 @@ public class VertexPool {
         return newVertex;
     }
 
-    //clearing it will save memory or something
+    //clearing later it will save memory or something
     public void clear() {
         sharedVertices.clear();
     }

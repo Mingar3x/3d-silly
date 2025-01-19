@@ -23,8 +23,7 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     private double mouseSensitivity=1.0;
 
     private Random r = new Random();
-    Geomentry geo = new Geomentry();//geometry instance, for making shapes easily
-
+    Geomentry geo = new Geomentry();//geometry.java instance
 
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
     int screenWidth = (int)size.getWidth();
@@ -61,7 +60,9 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     //this ↓↓ is the drawing method that is called every frame
     //i apologize for the shitty code that follows, i tried my best
     public void paintComponent(Graphics g) {
-        
+        //calculating camera matrix
+        Matrix viewMatrix = c.calculateViewMatrix();
+
         Graphics2D g2 = (Graphics2D) g;
 
         g2.setColor(Color.GREEN);
@@ -78,13 +79,35 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
         for (Map.Entry<VertexPool, TriangleGroup> entry : screenSpaceHashmap.entrySet()) { 
             VertexPool value = entry.getKey();
             for (Map.Entry<Vector3, Vector3> vertexEntry : value.sharedVertices.entrySet()) {
-                Vector3 vertex = vertexEntry.getValue();
-                //make a matrix from the x y and z
+                Vector3 v = vertexEntry.getValue();
 
-                //apply the projection matrix
-
-                //apply the view matrix
-
+                //make matrix of vertex
+                double[][] vertexArray = {
+                    {v.x},
+                    {v.y},
+                    {v.z},
+                    {1}
+                };
+                Matrix vertexMatrix = new Matrix(vertexArray);
+                //applying view matrix
+                Matrix viewCorrectedMatrix = viewMatrix.multiply(vertexMatrix);
+                System.out.println("viewMatrix rows: " + viewMatrix.getRows() + ", columns: " + viewMatrix.getColumns());
+                viewMatrix.display();
+                System.out.println("viewCorrectedMatrix rows: " + viewMatrix.getRows() + ", columns: " + viewMatrix.getColumns());
+                viewCorrectedMatrix.display();
+                System.out.println("projectionMatrix rows: " + projectionMatrix.getRows() + ", columns: " + projectionMatrix.getColumns());
+                projectionMatrix.display();
+                //projecting each vertex
+                Matrix projectedMatrix = projectionMatrix.multiply(viewCorrectedMatrix);
+                //homogenous division, this method returns an array with 3 axles
+                double[] normalizedArray = BigUtils.to3D(new double[]{
+                    projectedMatrix.get(0, 0), 
+                    projectedMatrix.get(0, 1), 
+                    projectedMatrix.get(0, 2), 
+                    projectedMatrix.get(0, 3)});
+                Matrix normalizedMatrix = new Matrix(new double[][]{{normalizedArray[0], normalizedArray[1], normalizedArray[2],1}});
+                
+                //Vector3 screenSpaceVector3 = new Vector3(normalizedArray[0], normalizedArray[1], normalizedArray[2]);
                 //????
                 //profit
             }
@@ -110,13 +133,11 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     }
     public void initalizeScreen(){
         // yo so this ↓↓ is the camera
-        c = new Camera(0, 0, 0, new Vector3(0, 0, 0));
+        c = new Camera(1, 1, 1, new Vector3(0, 5, 0));
         projectionMatrix = c.calculateProjectionMatrix(screenWidth, screenHeight);
         geo.makeStaticPlane(100,-100,100,-100,100,-100,Color.RED,Color.BLUE);
 
 
-        //for testing, this will print the whole projection matrix if needed
-        //projectionMatrix.display();
         
     }
     
@@ -138,7 +159,7 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
 }
     public void mouseMoved(MouseEvent e) {
         //nothing doing, buster
-        myFrame.repaint();
+        //myFrame.repaint();
     }
     public static void main(String[] args) {
         new Manager();
