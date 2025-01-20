@@ -42,6 +42,7 @@ public class BigUtils {
 
     //yes this method is basically the same as the one in the Matrix class, but this one is static
     //maybe that will matter eventually
+    //also this one doesn't really work so dont use it ok
     public static Matrix multiplyMatrices(Matrix A, Matrix B) {
         int aRows = A.getRows();
         int aCols = A.getColumns();

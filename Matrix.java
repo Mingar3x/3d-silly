@@ -1,12 +1,15 @@
 //this is a dynamic matrix class that can make matrices of any size
 //pretty cool, yuh?
 public class Matrix {
-    int rows;
-    int columns;
+    public int rows;
+    public int columns;
     double[][] array;
+    int mult = 0;
 
     //useless ahh constructor ↓↓
     public Matrix (int w, int h) {
+        this.columns = w;
+        this.rows = h;
         array = new double[h][w];
     }
     
@@ -22,7 +25,7 @@ public class Matrix {
 
     public double get(int row, int column) {
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
-            throw new IndexOutOfBoundsException("Index out of bounds: (" + row + ", " + column + ")");
+            System.out.println("Uh Oh! Index out of bounds: (" + row + ", " + column + ")");
         }
         return array[row][column];
     }
@@ -36,6 +39,14 @@ public class Matrix {
         }
     }
     public void set(int row, int column, double value) {
+        if (row < 0 || row >= rows || column < 0 || column >= columns) {
+            System.out.println("Uh Oh! Set Index for matrix is out of bounds: (" + row + ", " + column + ")");
+            System.out.println(("mult index: " + mult));
+            System.out.println("problematic matrix dimentions: "+"("+this.rows+", "+this.columns+")");
+            this.display();
+            
+
+        }
         array[row][column] = value;
     }
 
@@ -57,10 +68,10 @@ public class Matrix {
             System.out.println("BEEP BEEP BEEP THESE MATRICES CANT BE MULTLIPLIETed");
             System.out.println("-----------------");
             System.out.println("the problematic matrices were the following:");
-            System.out.println("Matrix 1:");
-            this.display();
-            System.out.println("Matrix 2:");
-            other.display();
+            System.out.println("Matrix 1 had " + this.columns + " columns and " + this.rows + " rows");
+            //this.display();
+            System.out.println("Matrix 2 had " + other.columns + " columns and " + other.rows + " rows");
+            //other.display();
         }
 
         Matrix result = new Matrix(other.columns, this.rows);
@@ -72,6 +83,7 @@ public class Matrix {
                 for (int k = 0; k < this.columns; k++) {
                     sum += this.array[i][k] * other.array[k][j];
                 }
+                mult++;
                 result.set(i, j, sum);
             }
         }

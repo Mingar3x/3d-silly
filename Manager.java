@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.util.Random;
+import javax.swing.Timer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class Manager extends JPanel implements KeyListener , MouseMotionListener {
     private JFrame myFrame;
     private double mouseSensitivity=1.0;
-
+    private int timeBetweenGameTicks = 100; //milliseconds
     private Random r = new Random();
     Geomentry geo = new Geomentry();//geometry.java instance
 
@@ -56,6 +57,8 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
         
         initalizeScreen();
         
+        Timer gameTimer = new Timer(timeBetweenGameTicks, e -> gameTick());
+        gameTimer.start();
     }
     //this ↓↓ is the drawing method that is called every frame
     //i apologize for the shitty code that follows, i tried my best
@@ -88,28 +91,38 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
                     {v.z},
                     {1}
                 };
+                
                 Matrix vertexMatrix = new Matrix(vertexArray);
+
                 //applying view matrix
                 Matrix viewCorrectedMatrix = viewMatrix.multiply(vertexMatrix);
-                System.out.println("viewMatrix rows: " + viewMatrix.getRows() + ", columns: " + viewMatrix.getColumns());
-                viewMatrix.display();
-                System.out.println("viewCorrectedMatrix rows: " + viewMatrix.getRows() + ", columns: " + viewMatrix.getColumns());
-                viewCorrectedMatrix.display();
-                System.out.println("projectionMatrix rows: " + projectionMatrix.getRows() + ", columns: " + projectionMatrix.getColumns());
-                projectionMatrix.display();
+                
                 //projecting each vertex
                 Matrix projectedMatrix = projectionMatrix.multiply(viewCorrectedMatrix);
+                // System.out.println("vertexMatrix rows: " + vertexMatrix.getRows() + ", columns: " + vertexMatrix.getColumns());
+                // vertexMatrix.display();
+                // System.out.println("viewMatrix rows: " + viewMatrix.getRows() + ", columns: " + viewMatrix.getColumns());
+                // viewMatrix.display();
+                // System.out.println("viewCorrectedMatrix rows: " + viewCorrectedMatrix.getRows() + ", columns: " + viewCorrectedMatrix.getColumns());
+                // viewCorrectedMatrix.display();
+                // System.out.println("projectionMatrix rows: " + projectionMatrix.getRows() + ", columns: " + projectionMatrix.getColumns());
+                // projectionMatrix.display();
+                // System.out.println("projectedMatrix rows: " + projectedMatrix.getRows() + ", columns: " + projectedMatrix.getColumns());
+                // projectedMatrix.display();
+
                 //homogenous division, this method returns an array with 3 axles
                 double[] normalizedArray = BigUtils.to3D(new double[]{
                     projectedMatrix.get(0, 0), 
-                    projectedMatrix.get(0, 1), 
-                    projectedMatrix.get(0, 2), 
-                    projectedMatrix.get(0, 3)});
+                    projectedMatrix.get(1, 0), 
+                    projectedMatrix.get(2, 0), 
+                    projectedMatrix.get(3, 0)});
                 Matrix normalizedMatrix = new Matrix(new double[][]{{normalizedArray[0], normalizedArray[1], normalizedArray[2],1}});
+                //normalizedMatrix.display();
+                Vector3 ssv3 = new Vector3(normalizedArray[0], normalizedArray[1], normalizedArray[2]);
+                System.out.println(ssv3);
+                g.setColor(Color.RED);
+                g.fillRect((int)ssv3.x, (int)ssv3.y, 5, 5);
                 
-                //Vector3 screenSpaceVector3 = new Vector3(normalizedArray[0], normalizedArray[1], normalizedArray[2]);
-                //????
-                //profit
             }
         }
 
@@ -133,21 +146,46 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
     }
     public void initalizeScreen(){
         // yo so this ↓↓ is the camera
-        c = new Camera(1, 1, 1, new Vector3(0, 5, 0));
+        c = new Camera(1, 1, 1, new Vector3(0, 0, 0));
         projectionMatrix = c.calculateProjectionMatrix(screenWidth, screenHeight);
         geo.makeStaticPlane(100,-100,100,-100,100,-100,Color.RED,Color.BLUE);
-
-
-        
     }
-    
+    public void gameTick() {
+        //other calculations and shit
 
-    public void keyTyped(KeyEvent e) {
+        repaint();
+    }
+
+    public void keyTyped(KeyEvent e) { 
         //Hey! I'm not implemented! Fix that!
     }
 
     public void keyPressed(KeyEvent e) {
-        //Hey! I'm not implemented! Fix that!
+        int keyCode = e.getKeyCode(); // Get the virtual key code
+                switch (keyCode) {
+                    case KeyEvent.VK_W:
+                        c.translate(0,-5,0);
+                        break;
+                    case KeyEvent.VK_A:
+                    c.translate(5,0,0);
+                        break;
+                    case KeyEvent.VK_S:
+                    c.translate(0,5,0);
+                        break;
+                    case KeyEvent.VK_D:
+                        System.out.println("Move right!");
+                        break;
+                    case KeyEvent.VK_SPACE:
+                    c.translate(0,5,0);
+                        break;
+                    case KeyEvent.VK_SHIFT:
+                        c.translate(0,-5,0);
+                        break;
+                    case KeyEvent.VK_ESCAPE:
+                        System.out.println("Exit game!");
+                        System.exit(0); // Quit the application
+                        break;
+                }
     }
 
     public void keyReleased(KeyEvent e) {
@@ -159,7 +197,7 @@ public class Manager extends JPanel implements KeyListener , MouseMotionListener
 }
     public void mouseMoved(MouseEvent e) {
         //nothing doing, buster
-        //myFrame.repaint();
+        myFrame.repaint();
     }
     public static void main(String[] args) {
         new Manager();

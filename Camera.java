@@ -49,6 +49,8 @@ public class Camera {
             {-forward[0], -forward[1], -forward[2], 0},
             {0, 0, 0, 1}
         });
+        // System.out.println("rotation dimentions: "+"("+rotation.rows+", "+rotation.columns+")");
+        // rotation.display();
 
         Matrix translation = new Matrix(new double[][] {
             {1, 0, 0, -eye[0]},
@@ -56,8 +58,21 @@ public class Camera {
             {0, 0, 1, -eye[2]},
             {0, 0, 0, 1}
         });
+        // System.out.println("translation dimentions: "+"("+translation.rows+", "+translation.columns+")");
+        // translation.display();
 
         // erm... 🤓 here goes nothing ☝️
-        return BigUtils.multiplyMatrices(rotation, translation);
+        return rotation.multiply(translation);
+    }
+    public void translate(double x, double y, double z) {
+        this.x+=x;
+        this.y+=y;
+        this.z+=z;
+    }
+    
+    public void translate(Vector3 v) {
+        this.x+=v.x;
+        this.y+=v.y;
+        this.z+=v.z;
     }
 }

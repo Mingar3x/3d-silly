@@ -4,8 +4,8 @@ public class test {
 
         Matrix viewMatrix = camera.calculateViewMatrix();
 
-        System.out.println("View Matrix:");
+        System.out.println("View Matrix dimentions: (" + viewMatrix.columns+", "+ viewMatrix.rows+")");
         viewMatrix.display();
     }
 }
-//
+//run and test arbitrary code here
